@@ -1,0 +1,316 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r setting}
+options(stringsAsFactors = FALSE)
+Sys.setlocale('LC_ALL','C')
+set.seed(1000)
+```
+
+```{r librabry import, message=FALSE}
+library(tm)
+library(qdap)
+library(spelling)
+library(hunspell)
+library(mgsub)
+library(pbapply)
+library(tidyr)
+library(dplyr)
+library(wordcloud)
+library(RColorBrewer)
+library(plyr)
+library(lexicon)
+library(tidytext)
+library(radarchart)
+library(stringr)
+library(fst)
+```
+
+```{r function import}
+tryTolower <- function(x){
+  y = NA
+  try_error = tryCatch(tolower(x), error = function(e) e)
+  if (!inherits(try_error, 'error'))
+    y = tolower(x)
+  return(y)
+}
+
+cleanCorpus<-function(corpus, customStopwords){
+  toSpace <- content_transformer(function(x, pattern) gsub(pattern, "", x))
+  corpus <- tm_map(corpus, content_transformer(qdapRegex::rm_url))
+  corpus <- tm_map(corpus, content_transformer(qdap::replace_contraction))
+  corpus <- tm_map(corpus, removeNumbers)
+  corpus <- tm_map(corpus, removePunctuation)
+  corpus <- tm_map(corpus, stripWhitespace)
+  corpus <- tm_map(corpus, content_transformer(tryTolower))
+  corpus <- tm_map(corpus, removeWords, customStopwords)
+  corpus <- tm_map(corpus, toSpace, "<.*?>")
+  return(corpus)
+}
+
+bigramTokens <-function(x){
+  unlist(lapply(NLP::ngrams(words(x), 2), paste, collapse = " "), 
+         use.names = FALSE)
+}
+
+cleanMatrix <- function(pth, columnName, collapse = F, customStopwords, 
+                        type, wgt){
+  
+  print(type)
+  
+  if(grepl('.csv', pth, ignore.case = T)==T){
+    print('reading in csv')
+    text      <- read.csv(pth)
+    text      <- text[,columnName]
+  }
+  if(grepl('.fst', pth)==T){
+    print('reading in fst')
+    text      <- fst::read_fst(pth)
+    text      <- text[,columnName]
+  } 
+  if(grepl('csv|fst', pth, ignore.case = T)==F){
+    stop('the specified path is not a csv or fst')
+  }
+  
+  
+  if(collapse == T){
+    text <- paste(text, collapse = ' ')
+  }
+  
+  print('cleaning text')
+  txtCorpus <- VCorpus(VectorSource(text))
+  txtCorpus <- cleanCorpus(txtCorpus, customStopwords)
+  
+  if(type =='TDM'){
+    if(wgt == 'weightTfIdf'){
+      termMatrix    <- TermDocumentMatrix(txtCorpus, 
+                                          control = list(weighting = weightTfIdf))
+    } else {
+      termMatrix   <- TermDocumentMatrix(txtCorpus)
+    }
+    
+    response  <- as.matrix(termMatrix)
+  } 
+  if(type =='DTM'){
+    if(wgt == 'weightTfIdf'){
+      termMatrix   <- DocumentTermMatrix(txtCorpus, 
+                                         control = list(weighting = weightTfIdf))
+    } else {
+      termMatrix    <- DocumentTermMatrix(txtCorpus)
+    }
+    response  <- as.matrix(termMatrix)
+    if(grepl('dtm|tdm', type, ignore.case=T) == F){
+      stop('type needs to be either TDM or DTM')
+    }
+    
+    
+  }
+  print('complete!')
+  return(response)
+}
+```
+
+```{r cleanMatrix without csv/fst import}
+cleanMatrix <- function(pth, columnName, collapse = F, customStopwords, 
+                        type, wgt){
+  print(pth)
+  print(type)
+  
+  text      <- pth[[columnName]]
+  
+  if(collapse == T){
+    text <- paste(text, collapse = ' ')
+  }
+  
+  print('cleaning text')
+  txtCorpus <- VCorpus(VectorSource(text))
+  txtCorpus <- cleanCorpus(txtCorpus, customStopwords)
+  
+  if(type =='TDM'){
+    if(wgt == 'weightTfIdf'){
+      termMatrix    <- TermDocumentMatrix(txtCorpus, 
+                                          control = list(weighting = weightTfIdf))
+    } else {
+      termMatrix   <- TermDocumentMatrix(txtCorpus)
+    }
+    
+    #response  <- as.matrix(termMatrix)
+    response  <- as.matrix(termMatrix)
+  } 
+  if(type =='DTM'){
+    if(wgt == 'weightTfIdf'){
+      termMatrix   <- DocumentTermMatrix(txtCorpus, 
+                                         control = list(weighting = weightTfIdf))
+    } else {
+      termMatrix    <- DocumentTermMatrix(txtCorpus)
+    }
+    
+    #response  <- as.matrix(termMatrix)
+    response  <- as.matrix(termMatrix)
+    if(grepl('dtm|tdm', type, ignore.case=T) == F){
+      stop('type needs to be either TDM or DTM')
+    }
+    
+    
+  }
+  print('complete!')
+  return(response)
+}
+```
+
+```{r stopwords}
+stops <- c(stopwords('SMART'),"call", "duty")
+```
+
+```{r team}
+teams <- list('ATLFaZe'      = c('abezy','Arcitys', 'Cellium', 'majormaniak', 'Priestahh','SimpXO'), 
+              'dallasempire' = c('Shotzzy', 'iLLeYYY', 'Huke', 'Crimsix'),
+              'mutineers'    = c('ColtHavok', 'Maux','CesarSkyz','FrostyBB','f3rocitys'), 
+              'RoyalRavens'  = c('wuskinz', 'skrapzg','Nastiee_','jurd','dylancod_'),
+              'LAGuerrillas' = c('Blazt','itsSpart','UAquaa','Decemate','VividTheWarrior'), 
+              'LAThieves'    = c('Drazah_', 'Kuavo', 'TJHaLy'), 
+              'rokkr'        = c('silly702','Assault','alexx1935','GstaAsim'),
+              'Subliners'    = c('Attach', 'ZooMaa','AccuracyLA','Temp','OpSuda'), 
+              'OpTicCHI'     = c('scump', 'FormaL','DylanEnvoy','DashySZN'),
+              'ParisLegion'  = c('DenzJT','KiSMET6_','MF_Louqa','ShockzCR','ZachDenyer'),
+              'SeattleSurge' = c('Apathy_BZ','DKarma','OctaneSam','Slacked','CaseyPandur'),
+              'torontoultra' = c('CammyMVP','Classic','Loony','Methodz','bance'), 
+              'Immortals'    = c('JKap415','SlasheR_AL','TJHaLy','DashySZN','Kuavo'))  
+```
+
+```{r import files, message=FALSE, echo=FALSE}
+txtFilesName <- list.files(path = "~/Desktop/Study/*Hult/*MsBA/NLP/hult_NLP_student1/cases/Call of Duty E-Sport/playerFollowerTimelines")
+path <- "~/Desktop/Study/*Hult/*MsBA/NLP/hult_NLP_student1/cases/Call of Duty E-Sport/playerFollowerTimelines"
+file.exists("~/Desktop/Study/*Hult/*MsBA/NLP/hult_NLP_student1/cases/Call of Duty E-Sport/playerFollowerTimelines")
+NewFilesNames <- str_remove(txtFilesName,"student_2020-12-30_")
+NewFilesNames <- str_remove(NewFilesNames,"_playerFollowerTimelines")
+NewFilesNames <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(NewFilesNames))
+
+for (i in 1:length(NewFilesNames)){
+  assign(NewFilesNames[i], read_fst(txtFilesName[i]))
+  cat(paste('read completed:',NewFilesNames[i],'\n'))
+}
+
+emoji <- read.csv('~/Desktop/Study/*Hult/*MsBA/NLP/hult_NLP_student1/cases/Call of Duty E-Sport/emojis.csv')
+```
+
+```{r Assign all data files to a list}
+NewFilesNamesLTV <- c('ATLFaZe_1596940411','ATLFaZe_2181448700','ATLFaZe_2261155832','ATLFaZe_2313386319','ATLFaZe_2390673350','ATLFaZe_2991273945','Immortals_1212292046','Immortals_1657077212','Immortals_252791673','Immortals_592125700','Immortals_831981685','LAGuerrillas_1127432147009253376','LAGuerrillas_1524109363','LAGuerrillas_2344166774','LAGuerrillas_323099683','LAGuerrillas_598230672','LAThieves_1212292046','LAThieves_4296408913','LAThieves_831981685','OpTicCHI_1657077212','OpTicCHI_249524030','OpTicCHI_272570677','OpTicCHI_925159100257849345','ParisLegion_1936404570','ParisLegion_2288492456','ParisLegion_2895885621','ParisLegion_496647230','ParisLegion_632774461','RoyalRavens_1876170271','RoyalRavens_2445382492','RoyalRavens_3437523701','RoyalRavens_357154799','RoyalRavens_748233682222256129','SeattleSurge_1265613414','SeattleSurge_1861916071','SeattleSurge_248807431','SeattleSurge_275359872','SeattleSurge_282399145','Subliners_326579770','Subliners_329941020','Subliners_373103022','Subliners_420606751','Subliners_865228975','dallasempire_231992478','dallasempire_2879351332','dallasempire_540448059','dallasempire_862056390','mutineers_1027768160','mutineers_1679964324','mutineers_3108015385','mutineers_3241026019','mutineers_436359211','rokkr_1126309800','rokkr_2216814458','rokkr_2869512074','rokkr_417576420','torontoultra_2155983409','torontoultra_2273422840','torontoultra_286489488','torontoultra_2878694927','torontoultra_335532964')
+```
+
+```{r slice 100 samples for each files}
+for (i in 1:length(NewFilesNamesLT)){
+  assign(NewFilesNamesLTV[i],  slice_sample(NewFilesNamesLT[[i]], n = 100))
+}
+```
+
+```{r merge all files to TotalDF}
+TotalDF <- ATLFaZe_1596940411
+for ( .df in NewFilesNamesLT) {
+  TotalDF <-merge(TotalDF,.df, all = T)
+}
+
+TotalDF
+```
+
+```{r cleanMatrix, message=FALSE, echo=FALSE}
+NewFilesNamesLT[[1]][["user_id"]]
+
+for (i in 1:length(NewFilesNamesLT)){
+name <- paste(i,"associateword",sep = "_")
+assign(name,  cleanMatrix(pth = NewFilesNamesLT[[i]],
+                          columnName  = 'text', # clue answer text 
+                          collapse = F, 
+                          customStopwords = stops, 
+                          type = 'DTM', 
+                          wgt = 'weightTf'))
+}
+
+
+associateword <- cleanMatrix(pth = Total,
+                      columnName  = 'text', # clue answer text 
+                      collapse = F, 
+                      customStopwords = stops, 
+                      type = 'DTM', 
+                      wgt = 'weightTf')
+
+associateword[5,1:5]
+dim(associateword)
+
+associateword      <- as.DocumentTermMatrix(associateword, weighting = weightTf ) 
+tidyAssociateword <- tidy(associateword)
+tidyAssociateword
+dim(tidyAssociateword)
+```
+
+```{r Analysising with lexicon - bing}
+bing <- get_sentiments(lexicon = c("bing"))
+head(bing)
+
+# Perform Inner Join
+bingSent <- inner_join(tidyAssociateword, bing, by=c('term' = 'word'))
+bingSent
+
+Bing <- table(bingSent$sentiment, bingSent$count)
+AggregateBing <- aggregate(count~sentiment,bingSent, sum)
+
+head(Bing)
+head(AggregateBing)
+
+#sentiments = polarity(removePunctuation(removeNumbers(tolower(dataframe.name$column.name))))
+polarityTotal <- polarity(Total$player,Total$text)
+polarityTotal$all
+```
+
+```{r Analysising with lexicon - afinn}
+# Get afinn lexicon
+afinn<-get_sentiments(lexicon = c("afinn"))
+head(afinn)
+
+# Perform Inner Join
+afinnSent <- inner_join(tidyAssociateword,afinn, by=c('term' = 'word'))
+head(afinnSent)
+
+# Quick Analysis
+weekndWords <- data.frame(word = unlist(strsplit(Total$text,' ')))
+weekndWords$word <- tolower(weekndWords)
+weekndWords <- left_join(weekndWords,afinn, by=c('word' = 'word'))
+weekndWords[is.na(weekndWords$value),2] <- 0
+plot(weekndWords$value, type="l", main="Quick Timeline of Identified Words") 
+```
+
+
+```{r Analysising with lexicon - NRC}
+nrc <- nrc_emotions
+head(nrc)
+
+# Clean this up
+#nrc <- read.csv('nrcSentimentLexicon.csv')
+#Use apply (rowwise) to find columns having value > 0
+terms <- subset(nrc, rowSums(nrc[,2:9])!=0)
+sent  <- apply(terms[,2:ncol(terms)], 1, function(x)which(x>0))
+head(sent)
+
+# Reshape
+nrcLex <- list()
+for(i in 1:length(sent)){
+  x <- sent[[i]]
+  x <- data.frame(term      = terms[i,1],
+                  sentiment = names(sent[[i]]))
+  nrcLex[[i]] <- x
+}
+nrcLex <- do.call(rbind, nrcLex)
+head(nrcLex)
+
+# Perform Inner Join
+nrcSent <- inner_join(tidyCorp,nrcLex, by=c('term' = 'term'))
+nrcSent
+
+# Quick Analysis
+emos <- aggregate(count ~ sentiment + document, nrcSent, sum)
+emos$document <- NULL
+chartJSRadar(scores = emos, labelSize = 10, showLegend = F)
+
+```
+
