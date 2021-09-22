@@ -1,0 +1,142 @@
+---
+title: 'Team project: Checkpoint'
+author: "Team 3 - Victoria Padua, Wai Hoi Li"
+subtitle: R for Data Science @ Hult University
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    highlight: pygments
+    number_sections: yes
+    theme: readable
+    toc: yes
+    toc_float:
+      collapsed: yes
+---
+# Abstract
+
+## Topic
+```{r}
+# Load package
+library(tidyverse)
+```
+
+# Abstract
+
+## Topic
+
+What is your topic? (1-2 sentences)
+
+## Motivation and background
+
+What is the motivation and background? Cite any previous studies/articles. (3 - 4 sentences)
+
+## Objectives
+
+One **clear** statement about **what** you want to achieve (if you have multiple goals, one clear statement per goal).
+
+## Plan
+
+A few **clear** statements about **how** you **plan** to achieve your goal.
+
+# Data 
+
+## Background
+
+[Freight transport](https://data.oecd.org/transport/freight-transport.htm)
+Freight transport is a data for recording the total movement of good using inland transportation. We collected this data because we could like to understand the differences on in-land freight transport comparing the US and some of the chosen countries.
+
+[NASDAQ:CL:NMX Historical Data](https://www.nasdaq.com/market-activity/commodities/cl%3Anmx/historical)
+This is the historical trading price for the crude oil. The unit of the price is USD/bbl, and bbl is the abbreviation for barrel for oil. We have chosen this data because we could like to investigate the change of oil price across the years.
+
+[Energy use for transportation](https://www.eia.gov/energyexplained/use-of-energy/transportation.php)
+This data is collected from the U.S. Energy Information Administration. We have chosen this data because we could like to have a grasp understanding on what is the type of energy usage based on transportation.
+
+[Electrifying Trucks: From Delivery Vans to Buses to 18-Wheelers](https://www.aceee.org/sites/default/files/pdfs/electric_trucks_1.pdf)
+This data is collected from the American Council for an Energy-Efficient Economy. The reason of choosing this dataset is because we could like to explore the cost of energy and truck based on truck type and fuel type.
+
+## Key variables
+
+```{r load data, message=FALSE, warning=FALSE}
+# Import all csv
+transport_countries = read_csv("oecd_freight_transport.csv")
+crude_oil_price_yearly = read_csv("HistoricalQuotes.csv")
+transportation_energy_source = read_csv("transportation-energy-source-fuels2019.csv")
+energy_cost_comparison_2018 = read_csv("comparison_annula_energy_cost_diesel_vs_electric_trucks.csv")
+```
+
+```{r}
+# Display the first 5 rows to confirm import successful
+transport_countries %>% slice_head(n=5)
+crude_oil_price_yearly %>% slice_head(n=5)
+transportation_energy_source %>% slice_head(n=5)
+energy_cost_comparison_2018 %>% slice_head(n=5)
+```
+
+Graph1
+```{r}
+  transport_countries %>% 
+  filter(location %in% c("AUS","CHN","DEU","RUS","IND","USA")) %>%
+  ggplot(data = ., aes(x= year, y= value, colour = location))+
+  geom_line()
+```
+
+Graph2
+```{r}
+crude_oil_price_yearly %>%
+    group_by(Date) %>% 
+    ggplot(data = ., aes(x= Date, y=  Close_Last))+
+    geom_line()+
+    geom_hline(yintercept = mean(crude_oil_price_yearly$Close_Last), colour = "red")
+```
+
+Graph3
+```{r}
+transportation_energy_source %>%
+    ggplot(data = ., aes(x = percentage_2019, y = fuel_type,fill = fuel_type))+
+    geom_bar(stat='identity')+
+    labs(y="Fuel Type", x="Fuel in total perctage in 2019")
+```
+
+Graph4 We could like to understand the annual energy cost in USD by fuel type and trcuk type because we need to know is the fleet ruck, whcih is mostly used by the logistic companies, is using more energy, and in terms of cost toward the company. Since we already known that logistic companies uses diesel oil engine, and most of the daily city delivery truck type is starting from class 3. We could have a g 
+```{r}
+energy_cost_comparison_2018 %>% 
+    ggplot(data = ., aes(x = energy_type, y = annual_energy_costs_US, fill = truck_type))+
+    geom_bar(stat='identity')+
+    geom_text(aes(label=annual_energy_costs_US), colour = "black", size=3, position = position_stack(vjust = 0.5))+
+    labs(x="Fuel type", y="Annual energy cost in USD")
+```
+Graph5
+```{r}
+energy_cost_comparison_2018 %>% 
+    ggplot(data = ., aes(x = energy_type, y = approx_upfront_cost_USD, fill = truck_type))+
+    geom_bar(stat='identity')+
+    geom_text(aes(label=approx_upfront_cost_USD), colour = "black", size=3, position = position_stack(vjust = 0.5))+coord_flip()+
+    labs(x="", y="")
+```
+
+```{r}
+energy_cost_comparison_2018 %>% 
+    ggplot(data = ., aes(x = energy_type, y = payback_years, fill = truck_type))+
+    geom_bar(stat='identity')+
+    geom_text(aes(label=payback_years), colour = "black", size=3, position = position_stack(vjust = 0.5))+coord_flip()+
+    labs(x="", y="")
+```
+
+
+
+# Analysis plan
+Explain how you **think** you will test your hypothesis (or hypotheses) or run your predictions. (4 - 5 sentences)
+We think we will test our hypothesis by 
+
+We will first start by finding out the crude oil usage of truck in the freight industry. Then, we will need to find out the percentage of fuel expenses in the industry. This will be calculated by randomly choosing 5 listed logistic companies in the top 50 in terms of company size in the Sates. We will then record down the fuel expensive proportion based on their income statement. Afterwards, we will generate a regression model to test if the shipping cost is related to the oil price. If we confirmed there is a relationship between oil price and shipping cost, then we will move on to generate the cost variances between oil and electric.
+
+We will first compare the oil price with the electricity price per truck in the past 10 
+
+We will first generate the outlier graph to understand the datasets that we have, then we will begin on running the regression based the said explored datasets.
+
+
+# Issues
+Tell me what you are unsure about. Could be your analysis plan, could be your data, whatever. (However many sentences you need.)
+Our data doesn't fully cover the analysis topic. Also, It is difficult to find data specifically targeting the electric car, such as the charging price in gas station for electric car in the past 10 years. 

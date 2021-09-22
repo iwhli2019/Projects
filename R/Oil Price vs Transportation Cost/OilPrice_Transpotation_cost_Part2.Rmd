@@ -1,0 +1,242 @@
+---
+title: 'Team project: Is changing to electric car monetarily benefit logistic industry
+  in terms of shipping cost'
+author: "Team 3 - Victoria Padua, Wai Hoi Li"
+subtitle: R for Data Science @ Hult University
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    highlight: pygments
+    number_sections: yes
+    theme: readable
+    toc: yes
+    toc_float:
+      collapsed: yes
+---
+
+# Set-up {-}
+  
+```{r load packages, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+# Introduction 
+
+Disclaimer: the following report focuses solely on on-road transportation in the US
+
+Throughout the years, the gap between revenue and profit in the Logistic and Transportation industry is evident. The breach is due to the challenge of managing costs in such a complex operations model. After identifying the principal costs of operation, fuel represents 24% of transportation costs, which is the most significant percentage amongst variable costs, according to McKinsey & Company (2010). With that in mind, it is convenient to take a glance at an important trend in 2020 within the logistics and transportation industry.	
+
+Are you familiar with the last-mile delivery? As a result of the Need-It-Now arising demand from users, logistics have been forced to evolve and build strategies to satisfy the urgency and follow the pace at which users are demanding the orders to arrive, but are these strategies profitable?   In the previous analysis, different subjects were evaluated in the pursuit of cost reduction and profit increase, including the most common fuel type in the US and volatility of oil price; in addition, a comparison of the price of the different energy types was performed together with the cost analysis of shifting logistics truck transportation from fuel to electric.
+	
+Findings from the analysis concluded that volatile fuel prices positively impact shipping prices. The oil price variation forces Logistics and Transportation corporations to constantly adjust their prices and operations dynamic, disfavoring the aforesaid companies' profit.  It was also discovered that alternative energy is scarcely used by cargo trucks, being electricity more cost-effective. However, shifting to electricity is highly costly to implement, with an average payback between 3 to 8 years on average, depending on the truck model.
+
+# Data 
+
+[NASDAQ:CL:NMX Historical Data](https://www.nasdaq.com/market-activity/commodities/cl%3Anmx/historical)
+This is the historical trading price for the crude oil. The unit of the price is USD/bbl, and bbl is the abbreviation for barrel for oil. We have chosen this data because we could like to investigate the change of oil price across the years.
+
+[Electrifying Trucks: From Delivery Vans to Buses to 18-Wheelers](https://www.aceee.org/sites/default/files/pdfs/electric_trucks_1.pdf)
+This data is collected from the American Council for an Energy-Efficient Economy. The reason of choosing this dataset is because we could like to explore the cost of energy and truck based on truck type and fuel type.
+
+[US Average retail electricity price (1990 - 2019)](https://www.statista.com/statistics/183700/us-average-retail-electricity-price-since-1990/)
+This is the historical pricing on average retail electricity price. We collected this data to compare the crude oil price. The unit is in US cents per kilowatt hour (kwh).
+
+[Cost type](https://www.mckinsey.com/~/media/mckinsey/dotcom/client_service/operations/pdfs/lean_and_mean-how_does_your_supply_chain_shape_up.pdf)
+This data is chosen because we want to how the proportion of fuel within the logistic companies' cost. The costs are seperated into variable cost and fixed cost.
+
+[Number of Gas Station 1996 -2012](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwiN2YrZ-t3tAhWDrFkKHUc2ByUQFjAAegQIBRAC&url=https%3A%2F%2Fafdc.energy.gov%2Ffiles%2Fu%2Fdata%2Fdata_source%2F10333%2F10333_gasoline_stations_year.xlsx&usg=AOvVaw25CGEENHg3tKWE7raD42w_)
+[Number of Gas Station 2013](https://slate.com/business/2016/06/why-americas-gas-stations-are-running-out-of-time.html)
+[Number of Gas Station 2014 - 2016](https://webcache.googleusercontent.com/search?q=cache:mVqmWITqlx8J:https://www.statista.com/statistics/525107/number-of-gasoline-stations-in-the-united-states/+&cd=1&hl=en&ct=clnk&gl=us&client=safari)
+These data are chosen because we want to investigate the variance and user trend between electricity charging station and gas station. 
+
+[Alternative fuel stations](https://www.bts.gov/alternative-fuel-stations)
+Alternative fuel stations includes the total number of all alternative fuel stations from 2009 to 2019. We have chosen this data because we could love to investigate is the number of electric charging stations increasing over the years and, by extend, showing are the general public and enterprise have starting to use more electric cars.
+
+
+```{r load data, message=FALSE, warning=FALSE}
+crude_oil_price_yearly = read_csv("HistoricalQuotes.csv")
+energy_cost_comparison_2018 = read_csv("comparison_annula_energy_cost_diesel_vs_electric_trucks.csv")
+avg_electricity_prices = read_csv("avg_retail_electricity_prices_US_1990_2019.csv")
+ftl_cost = read_csv("clean_sheet_ftl_costs.csv")
+us_gas_station = read_csv("gas_stations_number.csv")
+alt_fuel_stations = read_csv("alternative_fuel_stations.csv")
+```
+
+```{r first 5 rows display}
+# Display the first 6 rows to confirm import successful
+head(crude_oil_price_yearly)
+head(energy_cost_comparison_2018)
+head(avg_electricity_prices)
+head(ftl_cost)
+head(us_gas_station)
+head(alt_fuel_stations)
+```
+
+# Data Prepration (DP)
+
+```{r DP - Separate full date by year, month and day}
+# separate the full year date by year, month and day
+crude_oil_price_yearly = crude_oil_price_yearly %>%
+  mutate(full_date=Date) %>% 
+  separate(Date, sep="-", into = c("year", "month", "day"))
+
+# change the year, month and day into dbl type
+crude_oil_price_yearly$year = as.numeric(crude_oil_price_yearly$year)
+crude_oil_price_yearly$month = as.numeric(crude_oil_price_yearly$month)
+crude_oil_price_yearly$day = as.numeric(crude_oil_price_yearly$day)
+
+head(crude_oil_price_yearly)
+```
+
+
+```{r DP - Average Oil price}
+# Calculate the average crude oil price by year and allocate it to oil price yearly
+oil_price_yearly = crude_oil_price_yearly %>% 
+  group_by(year) %>% 
+  summarise(avg_oil_price = mean(Close_Last))
+
+head(crude_oil_price_yearly)
+```
+
+```{r DP - price chnage function, join tables}
+# Create a function call price_percentage _change to calculate the percentage change per year
+price_percentage_change = function(price,yr){
+  percentage_change = vector(mode="double",length = length(price))
+  year = vector(mode="double",length = length(price))
+  for(i in seq_along(price)){
+    percentage_change[i] = (price[i+1] -price[i])/price[i]
+    year[i] = yr[i]
+  }
+  percentage_change_tbl = tibble(year, percentage_change)
+  return(percentage_change_tbl)
+}
+
+# Use the price_percentage_change function and assign it to a new name
+electricity_price = price_percentage_change(avg_electricity_prices$us_cents_per_kilowatt_hour,avg_electricity_prices$year)
+oil_price = price_percentage_change(oil_price_yearly$avg_oil_price,oil_price_yearly$year)
+
+# rename the percentage change columns
+electricity_price = rename(electricity_price,electricity_percentage_change = percentage_change)
+oil_price = rename(oil_price,oil_percentage_change = percentage_change)
+
+# join two table together
+price_change_yearly = oil_price %>% left_join(electricity_price,by = "year")
+
+head(price_change_yearly)
+```
+
+```{r DP - select only the electric stations and join with gas stations table}
+electricity_station = alt_fuel_stations %>% 
+  filter(measure_names == "Electric") %>% 
+  select(year, measure_values) %>%
+  rename(no_electricity_stations = measure_values)
+  
+combined_tbl = us_gas_station %>% left_join(electricity_station,by = "year")
+
+combined_tbl %>% 
+  drop_na()
+```
+
+```{r DP - calculation 1}
+electricity_station1 = electricity_station %>% arrange(.,year)
+no_electricity_stations_change = price_percentage_change(electricity_station1$no_electricity_stations,electricity_station1$year)
+no_electricity_stations_change %>% 
+  drop_na() %>% 
+  summarise(avg_no_electricity_station = mean(percentage_change)) %>% 
+  mutate(avg_no_electricity_station = avg_no_electricity_station,avg_no_electricity_station = scales::percent(avg_no_electricity_station))
+```
+
+
+
+# Analysis 
+## Graph 1 - Fuel proportion in variable cost in logistic industry
+For the Logistics and Transportation industry, variable costs represent on average a third (32%) of total costs in Logistics and Transportation industry, and fuel expenses alone represent 24% of total costs (McKinsey & Company, 2010). The concentration of costs on fuel, denotes a great opportunity on business model implementations and strategies that have not yet been explored or are very mature in the market. By reducing variable costs it is possible to reduce the gap between revenue and profit for the industry.
+```{r Fuel proportion in variable cost in logistic industry}
+ftl_cost %>%
+  filter(cost_type=="variable") %>%
+  ggplot(data=.,aes(x=reorder(cost, -percentage), y=percentage))+
+  geom_bar(stat='identity')+ 
+  scale_x_discrete(label = stringr::str_wrap(ftl_cost$cost, width = 20))+
+  labs(x="Variable cost", y="Percentage proportion")+  
+  ggtitle("Fuel proportion in variable cost in logistic industry") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Graph 2 -Electricity and oil price change per year
+Due to the nature of the oil price, it is for certain that fluctuation of the price is huge. Conversely, electricity is an ideal alternative to sustainably reduce fuel costs for the low cost and price stability, as shown in the graph bellow. Consequently, carriers will  be exempted from assuming losses due to increases in oil prices and at the same time users will not have to pay unnecessarily rates that have been established as a protection measure against fluctuations in the price of oil.Below the comparison between oil and electricity price percentage change from 2010-2018:
+```{r Electricity and oil price change per year}
+# plot the percentage change graph
+price_change_yearly[1:9,] %>% 
+  ggplot(data=.,aes(x=year))+
+  geom_line(aes(y=oil_percentage_change,color="oil"))+
+  geom_line(aes(y=electricity_percentage_change,color="electricity"))+
+  scale_color_manual(name = "Group",
+  values = c( "oil" = "red", "electricity" = "blue"),
+  labels = c("electricity", "oil"))+
+  labs(x="Year",y="Percentage change")+  
+  ggtitle("Electricity and oil price change per year") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Table 1 - Variance of average price change on crude oil and electricity
+Even though the average price change on oil is negative, crude oil's historical pricing has indicated the fluctuation in oil price is vast. Therefore, it is hard to predict for budget control. In order to better investigate the shift to electric trucks as a better option, we must explore possible lurking variables.
+```{r Variance of average price change on crude oil and electricity}
+# average of electricity price change
+price_change_yearly %>%
+  drop_na() %>% 
+  summarise(avg_price_change_electricity = mean(electricity_percentage_change),
+            avg_price_change_oil = mean(oil_percentage_change),
+            variance = avg_price_change_electricity - avg_price_change_oil)
+```
+
+## Graph 3 - Annual energy cost in USD per fuel and truck type
+After comparing the electricity and oil pricing, we could like to investigate how much is the fuel cost per truck in both fuel types.The graph has shown electric truck is costing less compared to diesel trucks. Furthermore, this also indicates that the larger the truck is, the more it consumes fuel. Since most of the logistic companies have truck fleets rank from class 3 to 8, we could assume the potential fuel cost for the electric car is the total of the electric annual energy cost column times the number of truck fleets owned by the companies.
+```{r Annual energy cost in USD per fuel and truck type}
+energy_cost_comparison_2018 %>% 
+  ggplot(data = ., aes(x = energy_type, y = annual_energy_costs_US, fill = truck_type))+
+  geom_bar(stat='identity')+
+  geom_text(aes(label=annual_energy_costs_US), colour = "black", size=3, position = position_stack(vjust = 0.5))+
+  labs(x="Fuel type", y="Annual energy cost in USD")+  
+  ggtitle("Annual energy cost in USD per fuel and truck type") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  guides(fill=guide_legend(title="Truck Type"))
+```
+
+## Graph 4 - Gas and electricity stations (2009 - 2016)
+Furthermore, we could like to know if the usage of electricity charging stations is universal. This is because the number of charging stations could also serve as an indicator of electric cars' popularity within the general public and, by extension, enterprise. 
+
+The following chart shows the number of electric charging stations has an upward trend, while the number of the oil station remains almost the same from 2014 to 2016, after the dramatic drop in 2013. The trend of electricity charging stations has shown that even the number of charging stations has not yet reached the popularity level of the gas stations, it is catching up fast by 139% (number calculation, please see "DP - calculation 1")per year. This kind of proves that electric car is becoming more universal in the general public, in extends, enterprise level.
+```{r Gas and electricity stations (2009 - 2016)}
+combined_tbl %>% 
+  drop_na() %>% 
+  ggplot(data=., aes(x=year))+
+  geom_line(aes(y=no_gas_stations,color="gas"))+
+  geom_line(aes(y=no_electricity_stations,color="electricity"))+
+  scale_color_manual(name = "Group",
+  values = c( "gas" = "red", "electricity" = "blue"),
+  labels = c("electricity", "oil"))+
+  labs(x="Year",y="Number of stations")+  
+  ggtitle("Gas and electricity stations (2009 - 2016)") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Graph 5 - Vehicle cost by energy and truck type
+Nonetheless, we could like to know the sunk cost of investing in electric trucks, despite the depreciation on these fixed assets and the resale profit earned from the resale. This graph has clearly indicated the initial cost on buying a electric truck could cost from USD 240,000 to USD 67,000, which is USD 173,000 differences in between from class 2b to class 8. Furthermore, it is obvious that the higher the class is, comparing with the energy type. However, the differences between the energy type and truck type is increasing base on the truck type as well. For class 2b to 3, the difference between electric and diesel is only USD 17,000, while the difference between electric and diesel for class 8 truck is up to USD 110,000.This type of huge cost variation might causes the logistic companies think twice before buying it.
+```{r Vehicle cost by energy and truck type}
+energy_cost_comparison_2018 %>% 
+  ggplot(data = ., aes(x = energy_type, y = approx_upfront_cost_USD, fill = truck_type))+
+  geom_bar(stat='identity')+
+  geom_text(aes(label=approx_upfront_cost_USD), colour = "black", size=3, position = position_stack(vjust = 0.5))+
+  coord_flip()+
+  labs(x="Energy Type", y="Vehicle Cost")+  
+  ggtitle("Vehicle cost by energy and truck type") +
+  theme(plot.title = element_text(hjust = 0.5))+
+  guides(fill=guide_legend(title="Truck Type"))
+```
+
+# Conclusion 
+Logistics and Transportation industry is significantly dependent on oil price variation due to the large percentage of its fuel costs. By replacing conventional trucks by electric trucks, in the long term, companies in the industry can potentially benefit from cost reduction, and therefore, increased profit. However, the counterpart represents a 3-8 year payback in addition to a significant investment in fleet renewal.
+ 
+The next step of this analysis would be to explore lurking variables that may affect the implementation of electric vehicles in the industry. In addition to that, design of a pilot model and strategy definition on how to implement the new technologies and what other costs may take place (i.e. capacitaion, fleet replacement, etc.). 
