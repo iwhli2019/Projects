@@ -163,4 +163,11 @@ column_dtypes:
   day_of_week: TEXT
   quarter: TEXT
   is_weekday: INTEGER
+  member_policy_id: TEXT
+  policy_start_date: TEXT
+  policy_end_date: TEXT
+  transaction_id: TEXT
+  transaction_date: TEXT
+  transaction_type: TEXT
+  transaction_amount: REAL
 

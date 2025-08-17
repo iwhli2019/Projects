@@ -46,13 +46,19 @@ This document chronicles the iterative design and development of the `Profession
 ---
 
 ### Milestone 5: Debugging and Final Polish
-**My Thought Process:** *(Even with a solid design, execution always presents challenges. I encountered several errors during testing, from Python scope issues to data type mismatches with the database. I systematically worked through each one, refining the code to make it more robust and error-proof.)*
+**Initial Situation:**
+Even with a solid design, the initial script runs failed due to several technical errors. Beyond functionality, the code itself lacked a consistent naming convention for variables.
+
+**My Thought Process & Refinement:**
+*Instead of simply finding a workaround for errors like the `OutOfBoundsDatetime` issue, I re-evaluated the data modeling choices to find a more robust solution, such as using `NULL` for active records. Furthermore, I recognized that for the code to be truly professional, it needed internal consistency. I decided to standardize all DataFrame variable names to use the `df_` prefix (e.g., `df_members`), making the code more readable and maintainable.*
 
 **Key Chat Excerpt:**
 > **Me:** `pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime: Out of bounds nanosecond timestamp: 9999-12-31...`
-> **Me (later):** "How about we change the effective date to null and therefore, could minimise the change in the script? And in a way this is true since there's no end date for that record yet."
+> **Me (later):** "How about we change the effective date to null and no need to change much?"
+> **Me (later):** "actually we will need to update the name of each df form xxx_df to df_xxx"
 
-**Outcome:** This iterative debugging process led to a final script that is not only functional but also resilient, with professional-grade logging, error handling, and robust data conversion logic.
+**Outcome & Skills Demonstrated:**
+This iterative debugging and refinement process led to a final script that is not only functional and resilient but also clean and internally consistent. It showcases key analyst skills: not just fixing errors, but understanding their root cause, proposing better system designs, and adhering to **professional coding standards**. This demonstrates **Debugging**, **Problem-Solving**, and a strong **Attention to Detail**.
 
 ---
 
