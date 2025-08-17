@@ -1,0 +1,49 @@
+2025-08-16 00:08:13,363 - INFO - Log file for this run: logs\generation_20250816_000813.log
+2025-08-16 00:08:13,446 - INFO - --- Starting OLTP Database Generation ---
+2025-08-16 00:08:13,446 - INFO - Reproducible Seed: 36
+2025-08-16 00:08:39,452 - INFO - Connecting to database 'healthcare_oltp.db'...
+2025-08-16 00:08:39,452 - INFO - Writing table 'Policies'...
+2025-08-16 00:08:39,466 - INFO - Writing table 'Members'...
+2025-08-16 00:08:39,533 - ERROR - A fatal error occurred during script execution.
+Traceback (most recent call last):
+  File "pandas/_libs/tslibs/np_datetime.pyx", line 319, in pandas._libs.tslibs.np_datetime.pydate_to_dt64
+OverflowError: Overflow occurred in npy_datetimestruct_to_datetime
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\generate_dataset.py", line 501, in <module>
+    create_oltp_database(oltp_dataframes, config["column_dtypes"], DB_NAME)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\generate_dataset.py", line 432, in create_oltp_database
+    df_copy[col] = pd.to_datetime(df_copy[col]).dt.strftime("%Y-%m-%d")
+                   ~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\.venv\Lib\site-packages\pandas\core\tools\datetimes.py", line 1068, in to_datetime
+    cache_array = _maybe_cache(arg, format, cache, convert_listlike)
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\.venv\Lib\site-packages\pandas\core\tools\datetimes.py", line 249, in _maybe_cache
+    cache_dates = convert_listlike(unique_dates, format)
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\.venv\Lib\site-packages\pandas\core\tools\datetimes.py", line 437, in _convert_listlike_datetimes
+    result, tz_parsed = objects_to_datetime64(
+                        ~~~~~~~~~~~~~~~~~~~~~^
+        arg,
+        ^^^^
+    ...<4 lines>...
+        allow_object=True,
+        ^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\.venv\Lib\site-packages\pandas\core\arrays\datetimes.py", line 2415, in objects_to_datetime64
+    result, tz_parsed = tslib.array_to_datetime(
+                        ~~~~~~~~~~~~~~~~~~~~~~~^
+        data,
+        ^^^^^
+    ...<4 lines>...
+        creso=abbrev_to_npy_unit(out_unit),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "pandas/_libs/tslib.pyx", line 412, in pandas._libs.tslib.array_to_datetime
+  File "pandas/_libs/tslib.pyx", line 596, in pandas._libs.tslib.array_to_datetime
+  File "pandas/_libs/tslib.pyx", line 512, in pandas._libs.tslib.array_to_datetime
+  File "pandas/_libs/tslibs/np_datetime.pyx", line 322, in pandas._libs.tslibs.np_datetime.pydate_to_dt64
+pandas._libs.tslibs.np_datetime.OutOfBoundsDatetime: Out of bounds nanosecond timestamp: 9999-12-31, at position 0

@@ -1,0 +1,21 @@
+2025-08-16 00:18:05,797 - INFO - Log file for this run: logs\generation_20250816_001805.log
+2025-08-16 00:18:05,879 - INFO - --- Starting OLTP Database Generation ---
+2025-08-16 00:18:05,879 - INFO - Reproducible Seed: 36
+2025-08-16 00:18:11,391 - ERROR - A fatal error occurred during script execution.
+Traceback (most recent call last):
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\generate_dataset.py", line 505, in <module>
+    claims_df = generate_claims(
+        config,
+    ...<5 lines>...
+        fake,
+    )
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\generate_dataset.py", line 382, in generate_claims
+    active_member = active_members_df.sample(1).iloc[0]
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\.venv\Lib\site-packages\pandas\core\generic.py", line 6137, in sample
+    sampled_indices = sample.sample(obj_len, size, replace, weights, rs)
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\.venv\Lib\site-packages\pandas\core\sample.py", line 152, in sample
+    return random_state.choice(obj_len, size=size, replace=replace, p=weights).astype(
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "numpy/random/mtrand.pyx", line 964, in numpy.random.mtrand.RandomState.choice
+ValueError: a must be greater than 0 unless no samples are taken

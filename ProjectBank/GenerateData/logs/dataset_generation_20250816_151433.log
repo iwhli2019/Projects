@@ -1,0 +1,17 @@
+2025-08-16 15:14:33,689 - INFO - Log file for this run: logs\dataset_generation_20250816_151433.log
+2025-08-16 15:14:33,842 - INFO - --- Starting OLTP Database Generation ---
+2025-08-16 15:14:33,843 - INFO - Reproducible Seed: 36
+2025-08-16 15:14:33,843 - INFO - Generating foundational tables...
+2025-08-16 15:14:33,843 - INFO - Loading policy definitions from config.yaml...
+2025-08-16 15:14:37,180 - INFO - Loading clinical data definitions from config.yaml...
+2025-08-16 15:14:37,345 - INFO - Generating main transactional tables...
+2025-08-16 15:14:37,360 - ERROR - A fatal error occurred during script execution.
+Traceback (most recent call last):
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\main.py", line 60, in main
+    members_df = generate_members(config, policies_df, households_list, fake)
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\src\generators\members.py", line 39, in generate_members
+    age = get_age(dob)
+  File "C:\Users\liiri\Documents\Projects\py_project\ProjectBank\src\utils\helpers.py", line 6, in get_age
+    today = datetime.date.today()
+            ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'method_descriptor' object has no attribute 'today'
