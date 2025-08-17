@@ -1,0 +1,167 @@
+# config.yaml
+
+# --- CONFIGURATION & SEED ---
+seed: 36
+db_name: 'output/healthcare_oltp.db'
+
+# --- LOGGING SETUP ---
+logging:
+  log_directory: 'logs'
+  log_prefix: 'dataset_generation_'
+
+# --- DYNAMIC PROPORTIONS ---
+proportions:
+  group_members: [0.70, 0.75] # Min and Max for the random range
+  fraud_rate: [0.02, 0.10]    # Min and Max for the random range
+
+# --- RECORD COUNTS ---
+record_counts:
+  num_members_base: 20000
+  num_physicians: 250
+  num_providers: 150
+  num_claims: 15000
+
+# --- MASTER COLUMN DATA TYPE DEFINITION (DRY Principle) ---
+column_dtypes:
+  policy_id: TEXT
+  plan_name: TEXT
+  deductible: INTEGER
+  coinsurance_pct: REAL
+  copay_amt: INTEGER
+  member_id: TEXT
+  household_id: TEXT
+  first_name: TEXT
+  last_name: TEXT
+  dob: TEXT
+  sex: TEXT
+  gender: TEXT
+  title: TEXT
+  salary: REAL
+  address: TEXT
+  city: TEXT
+  postal_code: TEXT
+  unit_number: TEXT
+  company_name: TEXT
+  is_transfer_policy: INTEGER
+  is_deleted: INTEGER
+  policy_status: TEXT
+  status_change_date: TEXT
+  rec_start_date: TEXT
+  rec_end_date: TEXT
+  physician_id: TEXT
+  physician_name: TEXT
+  specialty: TEXT
+  provider_id: TEXT
+  provider_name: TEXT
+  network_status: TEXT
+  affiliation_id: TEXT
+  diagnosis_code: TEXT
+  description: TEXT
+  procedure_code: TEXT
+  valid_diagnosis_code: TEXT
+  base_fee: REAL
+  agreed_fee: REAL
+  claim_id: TEXT
+  service_date: TEXT
+  submit_date: TEXT
+  submitted_amt: REAL
+  paid_amt: REAL
+  is_fraudulent: INTEGER
+  date: TEXT
+  year: INTEGER
+  month: INTEGER
+  day: INTEGER
+  day_of_week: TEXT
+  quarter: TEXT
+  is_weekday: INTEGER
+
+# ... (rest of config file) ...
+
+# --- STATIC BUSINESS DATA ---
+policy_definitions:
+  - policy_id: 'G_PLATINUM'
+    plan_name: 'Group Platinum PPO'
+    deductible: 250
+    coinsurance_pct: 0.05
+    copay_amt: 20
+  - policy_id: 'G_GOLD'
+    plan_name: 'Group Gold PPO'
+    deductible: 500
+    coinsurance_pct: 0.10
+    copay_amt: 25
+  - policy_id: 'G_SILVER'
+    plan_name: 'Group Silver HMO'
+    deductible: 1000
+    coinsurance_pct: 0.20
+    copay_amt: 40
+  - policy_id: 'G_BRONZE'
+    plan_name: 'Group Bronze EPO'
+    deductible: 2000
+    coinsurance_pct: 0.25
+    copay_amt: 45
+  - policy_id: 'I_PLATINUM'
+    plan_name: 'Individual Platinum Plan'
+    deductible: 400
+    coinsurance_pct: 0.10
+    copay_amt: 25
+  - policy_id: 'I_GOLD'
+    plan_name: 'Individual Gold Plan'
+    deductible: 800
+    coinsurance_pct: 0.15
+    copay_amt: 35
+  - policy_id: 'I_SILVER'
+    plan_name: 'Individual Silver Plan'
+    deductible: 1500
+    coinsurance_pct: 0.25
+    copay_amt: 50
+  - policy_id: 'I_BRONZE'
+    plan_name: 'Individual Bronze Plan'
+    deductible: 3000
+    coinsurance_pct: 0.35
+    copay_amt: 60
+
+clinical_data:
+  icd10_codes:
+    J45: 'Asthma'
+    I10: 'Hypertension'
+    E11: 'Type 2 diabetes'
+    M54: 'Back pain'
+    S52: 'Fracture of forearm'
+  procedure_codes:
+    P001: 'Standard Consultation'
+    P002: 'Specialist Consultation'
+    P003: 'X-Ray'
+    P004: 'Blood Test'
+    P005: 'Minor Surgery'
+  procedure_diagnosis_link:
+    - { pc: 'P001', vdc: 'J45' }
+    - { pc: 'P001', vdc: 'I10' }
+    - { pc: 'P002', vdc: 'E11' }
+    - { pc: 'P002', vdc: 'M54' }
+    - { pc: 'P003', vdc: 'S52' }
+    - { pc: 'P003', vdc: 'M54' }
+    - { pc: 'P004', vdc: 'E11' }
+    - { pc: 'P005', vdc: 'S52' }
+  base_fees:
+    P001: 80
+    P002: 150
+    P003: 200
+    P004: 50
+    P005: 500
+
+provider_data:
+  specialties:
+    - 'Cardiology'
+    - 'Dermatology'
+    - 'General Practice'
+    - 'Neurology'
+    - 'Orthopedics'
+  network_status_weights:
+    'In-Network (HealthLink)': 0.6
+    'In-Network (Partner)': 0.3
+    'Out-of-Network': 0.1
+
+claim_parameters:
+  submit_date_lag_days: [2, 45] # Min and Max
+  fraud_upcharge_range: [1.15, 1.50] # 15% to 50% increase
+  normal_variance_range: [0.95, 1.05] # +/- 5%
