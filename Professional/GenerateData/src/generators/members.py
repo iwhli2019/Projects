@@ -1,7 +1,10 @@
 import random
+import logging
 import datetime
 import pandas as pd
 from ..utils.helpers import get_age
+
+logger = logging.getLogger(__name__)
 
 
 def generate_households(config, fake):
@@ -162,3 +165,95 @@ def generate_members(config, policies_df, households, fake):
         df.loc[transfer_indices, "is_transfer_policy"] = 1
 
     return df
+
+
+def generate_member_policies(config, df_members, df_policies, fake):
+    """
+    Generates the Dim_Member_Policies junction table with a robust chronological approach.
+    """
+    logger.info("Generating member policy enrollments...")
+
+    params = config["enrollment_parameters"]
+    start_range = [
+        f"-{params['initial_start_date_years_ago'][1]}y",
+        f"-{params['initial_start_date_years_ago'][0]}y",
+    ]
+
+    unique_member_ids = df_members["member_id"].unique()
+    group_policies = df_policies[df_policies["policy_id"].str.startswith("G")][
+        "policy_id"
+    ].tolist()
+    personal_policies = df_policies[df_policies["policy_id"].str.startswith("I")][
+        "policy_id"
+    ].tolist()
+
+    group_prop_range = config["proportions"]["group_members"]
+    GROUP_PROPORTION = random.uniform(group_prop_range[0], group_prop_range[1])
+
+    policies_data = []
+    member_policy_id_counter = 1
+
+    for member_id in unique_member_ids:
+        # Decide if a member has a history of more than one policy
+        num_policies = random.choices([1, 2], weights=[0.9, 0.1], k=1)[0]
+
+        # This will track the end date of the previously generated policy
+        last_policy_end_date = None
+
+        for i in range(num_policies):
+            policy_id = (
+                random.choice(group_policies)
+                if random.random() < GROUP_PROPORTION
+                else random.choice(personal_policies)
+            )
+
+            # --- NEW CHRONOLOGICAL LOGIC ---
+            if last_policy_end_date:
+                # If there was a previous policy, the new one must start after it.
+                # We'll add a random gap of 30 to 180 days.
+                start_date_for_new_policy = last_policy_end_date + datetime.timedelta(
+                    days=random.randint(30, 180)
+                )
+            else:
+                # This is the member's first policy.
+                start_date_for_new_policy = fake.date_between(
+                    start_date=start_range[0], end_date=start_range[1]
+                )
+
+            # Determine if this is the last (and therefore active) policy for this member
+            is_active_policy = i == num_policies - 1
+
+            if is_active_policy:
+                end_date_for_this_policy = None
+            else:
+                # This is a historical policy, so it needs an end date.
+                if policy_id.startswith("I"):
+                    # Individual policies lapse around their anniversary
+                    end_date_for_this_policy = fake.date_between(
+                        start_date=start_date_for_new_policy
+                        + datetime.timedelta(days=360),
+                        end_date=start_date_for_new_policy
+                        + datetime.timedelta(days=400),
+                    )
+                else:
+                    # Group policies can terminate any time after a minimum period (e.g., 90 days)
+                    end_date_for_this_policy = fake.date_between(
+                        start_date=start_date_for_new_policy
+                        + datetime.timedelta(days=90)
+                    )
+
+                # Keep track of this end date for the next loop iteration
+                last_policy_end_date = end_date_for_this_policy
+
+            policies_data.append(
+                {
+                    "member_policy_id": f"MP_{member_policy_id_counter}",
+                    "member_id": member_id,
+                    "policy_id": policy_id,
+                    "policy_start_date": start_date_for_new_policy,
+                    "policy_end_date": end_date_for_this_policy,
+                }
+            )
+            member_policy_id_counter += 1
+
+    return pd.DataFrame(policies_data)

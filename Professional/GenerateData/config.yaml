@@ -110,6 +110,10 @@ clinical_data:
     P004: 50
     P005: 500
 
+enrollment_parameters:
+  initial_start_date_years_ago: [2, 10]  # A new member's first policy started between 2 and 10 years ago
+  historical_end_date_years_ago: [1, 5]   # An old, lapsed policy ended between 1 and 5 years ago
+
 # --- MASTER COLUMN DATA TYPE DEFINITION (DRY Principle) ---
 column_dtypes:
   policy_id: TEXT

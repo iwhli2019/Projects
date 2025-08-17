@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import random
-from datetime import timedelta
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def generate_financial_transactions(config, member_policies_df, fake):
         end_date = (
             pd.to_datetime(row["policy_end_date"])
             if pd.notna(row["policy_end_date"])
-            else datetime.now()
+            else datetime.datetime.now()
         )
 
         current_date = start_date
