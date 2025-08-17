@@ -2,7 +2,7 @@
 
 # --- CONFIGURATION & SEED ---
 seed: 36
-db_name: 'output/healthcare_oltp.db'
+db_base_name: 'output/healthcare_oltp'
 
 # --- LOGGING SETUP ---
 logging:
@@ -21,61 +21,22 @@ record_counts:
   num_providers: 150
   num_claims: 15000
 
-# --- MASTER COLUMN DATA TYPE DEFINITION (DRY Principle) ---
-column_dtypes:
-  policy_id: TEXT
-  plan_name: TEXT
-  deductible: INTEGER
-  coinsurance_pct: REAL
-  copay_amt: INTEGER
-  member_id: TEXT
-  household_id: TEXT
-  first_name: TEXT
-  last_name: TEXT
-  dob: TEXT
-  sex: TEXT
-  gender: TEXT
-  title: TEXT
-  salary: REAL
-  address: TEXT
-  city: TEXT
-  postal_code: TEXT
-  unit_number: TEXT
-  company_name: TEXT
-  is_transfer_policy: INTEGER
-  is_deleted: INTEGER
-  policy_status: TEXT
-  status_change_date: TEXT
-  rec_start_date: TEXT
-  rec_end_date: TEXT
-  physician_id: TEXT
-  physician_name: TEXT
-  specialty: TEXT
-  provider_id: TEXT
-  provider_name: TEXT
-  network_status: TEXT
-  affiliation_id: TEXT
-  diagnosis_code: TEXT
-  description: TEXT
-  procedure_code: TEXT
-  valid_diagnosis_code: TEXT
-  base_fee: REAL
-  agreed_fee: REAL
-  claim_id: TEXT
-  service_date: TEXT
-  submit_date: TEXT
-  submitted_amt: REAL
-  paid_amt: REAL
-  is_fraudulent: INTEGER
-  date: TEXT
-  year: INTEGER
-  month: INTEGER
-  day: INTEGER
-  day_of_week: TEXT
-  quarter: TEXT
-  is_weekday: INTEGER
+claim_parameters:
+  submit_date_lag_days: [2, 45] # Min and Max
+  fraud_upcharge_range: [1.15, 1.50] # 15% to 50% increase
+  normal_variance_range: [0.95, 1.05] # +/- 5%
 
-# ... (rest of config file) ...
+provider_data:
+  specialties:
+    - 'Cardiology'
+    - 'Dermatology'
+    - 'General Practice'
+    - 'Neurology'
+    - 'Orthopedics'
+  network_status_weights:
+    'In-Network (HealthLink)': 0.6
+    'In-Network (Partner)': 0.3
+    'Out-of-Network': 0.1
 
 # --- STATIC BUSINESS DATA ---
 policy_definitions:
@@ -149,19 +110,57 @@ clinical_data:
     P004: 50
     P005: 500
 
-provider_data:
-  specialties:
-    - 'Cardiology'
-    - 'Dermatology'
-    - 'General Practice'
-    - 'Neurology'
-    - 'Orthopedics'
-  network_status_weights:
-    'In-Network (HealthLink)': 0.6
-    'In-Network (Partner)': 0.3
-    'Out-of-Network': 0.1
+# --- MASTER COLUMN DATA TYPE DEFINITION (DRY Principle) ---
+column_dtypes:
+  policy_id: TEXT
+  plan_name: TEXT
+  deductible: INTEGER
+  coinsurance_pct: REAL
+  copay_amt: INTEGER
+  member_id: TEXT
+  household_id: TEXT
+  first_name: TEXT
+  last_name: TEXT
+  dob: TEXT
+  sex: TEXT
+  gender: TEXT
+  title: TEXT
+  salary: REAL
+  address: TEXT
+  city: TEXT
+  postal_code: TEXT
+  unit_number: TEXT
+  company_name: TEXT
+  is_transfer_policy: INTEGER
+  is_deleted: INTEGER
+  policy_status: TEXT
+  status_change_date: TEXT
+  rec_start_date: TEXT
+  rec_end_date: TEXT
+  physician_id: TEXT
+  physician_name: TEXT
+  specialty: TEXT
+  provider_id: TEXT
+  provider_name: TEXT
+  network_status: TEXT
+  affiliation_id: TEXT
+  diagnosis_code: TEXT
+  description: TEXT
+  procedure_code: TEXT
+  valid_diagnosis_code: TEXT
+  base_fee: REAL
+  agreed_fee: REAL
+  claim_id: TEXT
+  service_date: TEXT
+  submit_date: TEXT
+  submitted_amt: REAL
+  paid_amt: REAL
+  is_fraudulent: INTEGER
+  date: TEXT
+  year: INTEGER
+  month: INTEGER
+  day: INTEGER
+  day_of_week: TEXT
+  quarter: TEXT
+  is_weekday: INTEGER
 
-claim_parameters:
-  submit_date_lag_days: [2, 45] # Min and Max
-  fraud_upcharge_range: [1.15, 1.50] # 15% to 50% increase
-  normal_variance_range: [0.95, 1.05] # +/- 5%
