@@ -114,6 +114,28 @@ enrollment_parameters:
   initial_start_date_years_ago: [2, 10]  # A new member's first policy started between 2 and 10 years ago
   historical_end_date_years_ago: [1, 5]   # An old, lapsed policy ended between 1 and 5 years ago
 
+# In config.yaml
+geography_data:
+  area_code_map:
+    AB: ['403', '587', '780', '825']
+    BC: ['236', '250', '604', '778']
+    MB: ['204', '431']
+    NB: ['506']
+    NL: ['709']
+    NS: ['902']
+    NT: ['867']
+    NU: ['867']
+    ON: ['226', '249', '289', '343', '365', '416', '437', '519', '548', '613', '647', '705', '807', '905']
+    PE: ['902']
+    QC: ['418', '438', '450', '514', '579', '581', '819', '873']
+    SK: ['306', '639']
+    YT: ['867']
+
+company_parameters:
+  base_company_count: 75
+  # Corresponds to 1, 2, or 3 locations
+  location_weights: [0.80, 0.15, 0.05]
+
 # --- MASTER COLUMN DATA TYPE DEFINITION (DRY Principle) ---
 column_dtypes:
   policy_id: TEXT
@@ -174,4 +196,11 @@ column_dtypes:
   transaction_date: TEXT
   transaction_type: TEXT
   transaction_amount: REAL
-
+  company_name: TEXT
+  company_address: TEXT
+  company_phone: TEXT
+  company_website: TEXT
+  company_email: TEXT
+  company_province: TEXT
+  city: TEXT
+  postal_code: TEXT

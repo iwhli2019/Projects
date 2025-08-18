@@ -9,6 +9,7 @@ from faker import Faker
 
 # Import functions from your custom modules
 from src.generators.claims import generate_claims
+from src.generators.companies import generate_companies
 from src.generators.financials import generate_financial_transactions
 from src.generators.members import (
     generate_households,
@@ -56,6 +57,7 @@ def main():
         # --- GENERATE ALL DATA IN LOGICAL ORDER ---
         logging.info("Generating foundational tables...")
         df_policies = generate_policies(config)
+        df_companies = generate_companies(config, fake)
         list_households = generate_households(config, fake)
         df_diagnoses, df_procedures, df_proc_diag_link, df_fee_schedule = (
             generate_codes_and_fees(config)
@@ -86,6 +88,7 @@ def main():
         # --- PACKAGE & LOAD TO DATABASE ---
         oltp_dataframes = {
             "Dim_Policy": df_policies,
+            "Dim_Company": df_companies,
             "Dim_Member": df_members,
             "Dim_Member_Policies": df_member_policies,
             "Dim_Physician": df_physicians,

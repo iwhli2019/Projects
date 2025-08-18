@@ -1,0 +1,109 @@
+[0m15:07:54.505778 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C8D860830>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C8C3B4910>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C8F928690>]}
+
+
+============================== 15:07:54.537950 | 2422fd09-56a0-44a9-b1f6-e731d97dec21 ==============================
+[0m15:07:54.537950 [info ] [MainThread]: Running with dbt=1.10.9
+[0m15:07:54.538841 [debug] [MainThread]: running dbt with arguments {'partial_parse': 'True', 'write_json': 'True', 'send_anonymous_usage_stats': 'True', 'version_check': 'True', 'cache_selected_only': 'False', 'target_path': 'None', 'warn_error': 'None', 'invocation_command': 'dbt init', 'log_format': 'default', 'use_colors': 'True', 'introspect': 'True', 'debug': 'False', 'printer_width': '80', 'fail_fast': 'False', 'no_print': 'None', 'quiet': 'False', 'use_experimental_parser': 'False', 'log_cache_events': 'False', 'empty': 'None', 'log_path': 'logs', 'indirect_selection': 'eager', 'profiles_dir': 'C:\\Users\\liiri\\.dbt', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])'}
+[0m15:07:54.606932 [info ] [MainThread]: Creating dbt configuration folder at C:\Users\liiri\.dbt
+[0m15:13:23.904215 [debug] [MainThread]: Starter project path: C:\Users\liiri\Documents\Projects\Professional\ClaimsDM\.venv\Lib\site-packages\dbt\include\starter_project
+[0m15:13:23.939104 [info ] [MainThread]: 
+Your new dbt project "claims_datamart" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m15:13:23.939994 [info ] [MainThread]: Setting up your profile.
+[0m15:13:38.697964 [info ] [MainThread]: Profile claims_datamart written to C:\Users\liiri\.dbt\profiles.yml using target's sample configuration. Once updated, you'll be able to start developing with dbt.
+[0m15:13:38.699138 [debug] [MainThread]: Command `dbt init` succeeded at 15:13:38.699036 after 344.31 seconds
+[0m15:13:38.699425 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C8FBB1CD0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C8D8FD130>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024C8FBA87C0>]}
+[0m15:13:38.699731 [debug] [MainThread]: Flushing usage events
+[0m15:13:39.256221 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:15:38.024480 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A821F901A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A81FBE5D10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002A82402BC50>]}
+
+
+============================== 15:15:38.029535 | 842b2a43-a293-49f2-8e6e-b30b1a1fc8c6 ==============================
+[0m15:15:38.029535 [info ] [MainThread]: Running with dbt=1.10.9
+[0m15:15:38.030111 [debug] [MainThread]: running dbt with arguments {'partial_parse': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'send_anonymous_usage_stats': 'True', 'use_colors': 'True', 'cache_selected_only': 'False', 'target_path': 'None', 'warn_error': 'None', 'invocation_command': 'dbt init', 'log_format': 'default', 'version_check': 'True', 'introspect': 'True', 'debug': 'False', 'log_cache_events': 'False', 'fail_fast': 'False', 'no_print': 'None', 'empty': 'None', 'printer_width': '80', 'quiet': 'False', 'use_experimental_parser': 'False', 'log_path': 'logs', 'indirect_selection': 'eager', 'write_json': 'True', 'static_parser': 'True', 'profiles_dir': 'C:\\Users\\liiri\\Documents\\Projects\\Professional\\ClaimsDm'}
+[0m15:16:27.819919 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018B97A201A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018B95601D10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018B98AEFC50>]}
+
+
+============================== 15:16:27.823920 | 0f86a922-c8c8-40bb-8618-c79bba9c4f5b ==============================
+[0m15:16:27.823920 [info ] [MainThread]: Running with dbt=1.10.9
+[0m15:16:27.824388 [debug] [MainThread]: running dbt with arguments {'partial_parse': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'send_anonymous_usage_stats': 'True', 'use_colors': 'True', 'cache_selected_only': 'False', 'target_path': 'None', 'version_check': 'True', 'invocation_command': 'dbt run --profiles-dir .', 'log_format': 'default', 'warn_error': 'None', 'introspect': 'True', 'debug': 'False', 'printer_width': '80', 'fail_fast': 'False', 'no_print': 'None', 'use_experimental_parser': 'False', 'empty': 'False', 'log_cache_events': 'False', 'quiet': 'False', 'log_path': 'logs', 'indirect_selection': 'eager', 'write_json': 'True', 'static_parser': 'True', 'profiles_dir': '.'}
+[0m15:16:27.824763 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\liiri\Documents\Projects\Professional\ClaimsDM\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m15:16:27.825483 [debug] [MainThread]: Command `dbt run` failed at 15:16:27.825392 after 0.12 seconds
+[0m15:16:27.825747 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018B98B482B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018B989D3E30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018B989816A0>]}
+[0m15:16:27.826022 [debug] [MainThread]: Flushing usage events
+[0m15:16:28.319435 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:20:58.565133 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018C757C01A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018C733C5D10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018C7785BC50>]}
+
+
+============================== 15:20:58.569284 | 115c122e-047c-488c-89d2-d6259e4bebd5 ==============================
+[0m15:20:58.569284 [info ] [MainThread]: Running with dbt=1.10.9
+[0m15:20:58.569772 [debug] [MainThread]: running dbt with arguments {'partial_parse': 'True', 'profiles_dir': 'C:\\Users\\liiri\\.dbt', 'send_anonymous_usage_stats': 'True', 'version_check': 'True', 'cache_selected_only': 'False', 'target_path': 'None', 'use_colors': 'True', 'invocation_command': 'dbt init claimsDM --project-dir C:\\Users\\liiri\\Documents\\Projects\\Professional\\ClaimsDM', 'log_format': 'default', 'warn_error': 'None', 'introspect': 'True', 'debug': 'False', 'log_cache_events': 'False', 'fail_fast': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'printer_width': '80', 'use_experimental_parser': 'False', 'log_path': 'logs', 'indirect_selection': 'eager', 'write_json': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'static_parser': 'True'}
+[0m15:20:58.588877 [info ] [MainThread]: Creating dbt configuration folder at C:\Users\liiri\.dbt
+[0m15:20:58.590890 [debug] [MainThread]: Starter project path: C:\Users\liiri\Documents\Projects\Professional\ClaimsDM\.venv\Lib\site-packages\dbt\include\starter_project
+[0m15:20:58.606870 [info ] [MainThread]: 
+Your new dbt project "claimsDM" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m15:20:58.607467 [info ] [MainThread]: Setting up your profile.
+[0m15:21:13.243912 [info ] [MainThread]: Profile claimsDM written to C:\Users\liiri\.dbt\profiles.yml using target's sample configuration. Once updated, you'll be able to start developing with dbt.
+[0m15:21:13.245043 [debug] [MainThread]: Command `dbt init` succeeded at 15:21:13.244922 after 14.84 seconds
+[0m15:21:13.245360 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018C778BA9E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018C75B7F890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018C779307C0>]}
+[0m15:21:13.245663 [debug] [MainThread]: Flushing usage events
+[0m15:21:13.710922 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:22:10.397415 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C7194901A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C717085D10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C71B52BC50>]}
+
+
+============================== 15:22:10.401567 | 655ac908-9daa-4ddc-b0e3-b4b34b8e519e ==============================
+[0m15:22:10.401567 [info ] [MainThread]: Running with dbt=1.10.9
+[0m15:22:10.402125 [debug] [MainThread]: running dbt with arguments {'partial_parse': 'True', 'write_json': 'True', 'send_anonymous_usage_stats': 'True', 'version_check': 'True', 'cache_selected_only': 'False', 'target_path': 'None', 'warn_error': 'None', 'invocation_command': 'dbt init claimsDM_dbt --project-dir C:\\Users\\liiri\\Documents\\Projects\\Professional\\ClaimsDM', 'log_format': 'default', 'use_colors': 'True', 'introspect': 'True', 'debug': 'False', 'printer_width': '80', 'fail_fast': 'False', 'no_print': 'None', 'empty': 'None', 'use_experimental_parser': 'False', 'log_cache_events': 'False', 'quiet': 'False', 'log_path': 'logs', 'indirect_selection': 'eager', 'profiles_dir': 'C:\\Users\\liiri\\.dbt', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])'}
+[0m15:22:10.422177 [debug] [MainThread]: Starter project path: C:\Users\liiri\Documents\Projects\Professional\ClaimsDM\.venv\Lib\site-packages\dbt\include\starter_project
+[0m15:22:10.438898 [info ] [MainThread]: 
+Your new dbt project "claimsDM_dbt" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m15:22:10.439498 [info ] [MainThread]: Setting up your profile.
+[0m15:22:14.688896 [debug] [MainThread]: Command `dbt init` succeeded at 15:22:14.688742 after 4.41 seconds
+[0m15:22:14.689231 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C71B589810>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C71984F890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001C71B5FC7C0>]}
+[0m15:22:14.689532 [debug] [MainThread]: Flushing usage events
+[0m15:22:15.164824 [debug] [MainThread]: An error was encountered while trying to flush usage events
