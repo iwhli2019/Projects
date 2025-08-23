@@ -35,14 +35,24 @@ select
     po.plan_name as policy_plan_name,
     po.deductible as policy_deductible,
 
-    -- Self-defined demo
+    -- Self-defined demo group/calculation
     hh.household_income,
+    cast(julianday(cl.service_date) - julianday(mb.date_of_birth) as integer) / 365 as member_age_at_claim,
 
     -- Business Logic
     case
         when mb.rec_end_date is null then 1
         else 0
-    end as is_member_active
+    end as is_member_active,
+    
+   cast(julianday(cl.claim_submit_date) - julianday(cl.service_date) as integer) as claim_lag_days,
+
+    case
+        when cast(julianday(cl.service_date) - julianday(
+            lag(cl.service_date, 1) over (partition by mb.member_id order by cl.service_date)
+        ) as integer) <= 30 then 1
+        else 0
+    end as is_30_day_readmission    
 
 from
     {{ ref('stg_claims') }} as cl
@@ -64,5 +74,5 @@ left join
     {{ ref('stg_policies') }} as po 
         on mp.policy_id = po.policy_id
 left join
-    {{ ref('int_member_household_income') }} as hh
+    {{ ref('int_ClaimsDM_member_household_income') }} as hh
         on mb.member_sk = hh.member_sk
