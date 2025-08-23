@@ -1,18 +1,15 @@
--- This model creates the final, denormalized Claims Data Mart
 -- It joins all the staging models to create a single, wide table for analytics.
 
 select
-    -- Claim Details from stg_claims
+    -- Claim Details
     cl.claim_id,
     cl.service_date,
-    cl.claim_date,
+    cl.submit_date as claim_submit_date,
     cl.claim_type,
-    cl.claim_amount,
-    cl.paid_amount,
-    cl.copay_amount,
-    cl.claim_status,
-
-    -- Member Details from stg_members
+    cl.submitted_amt as claim_amount,
+    cl.paid_amt as paid_amount,
+    
+    -- Member Details
     mb.member_id,
     mb.first_name,
     mb.last_name,
@@ -20,37 +17,52 @@ select
     mb.marital_status,
     mb.date_of_birth,
     mb.city as member_city,
-    mb.province as member_province,
-    mb.employer_name,
+    mb.is_transfer_policy,
+    
+    -- Company Details
+    co.company_name,
+    co.city as company_city,
+    co.company_province,
+    co.is_multi_location,
 
-    -- Provider Details from stg_providers
-    pr.provider_id,
+    -- Provider Details
     pr.provider_name,
     pr.provider_type,
+    pr.city as provider_city,
 
-    -- Policy Details from stg_policies
+    -- Policy Details
     po.policy_id,
-    po.policy_type,
-    po.premium,
-    po.deductible,
-    po.policy_status,
+    po.plan_name as policy_plan_name,
+    po.deductible as policy_deductible,
 
-    -- Business logics
+    -- Self-defined demo
+    hh.household_income,
+
+    -- Business Logic
     case
-        when cl.claim_status = 'Paid' then 'Completed'
-        when cl.claim_status = 'Pending' then 'In Progress'
-        else 'Unknown'
-    end as claim_status_group,
-
-    case when mb.member_id is not null then 1 else 0 end as flag_is_active
+        when mb.rec_end_date is null then 1
+        else 0
+    end as is_member_active
 
 from
     {{ ref('stg_claims') }} as cl
 left join
     {{ ref('stg_members') }} as mb
-        on cl.member_sk = mb.member_sk
-        and cl.service_date between mb.rec_start_date and mb.rec_end_date
+        on cl.member_id = mb.member_id
+        and cast(cl.service_date as date) between cast(mb.rec_start_date as date) and coalesce(cast(mb.rec_end_date as date), date('now'))
 left join
-    {{ ref('stg_providers') }} as pr on cl.provider_sk = pr.provider_sk
+    {{ ref('stg_companies') }} as co 
+        on mb.company_id = co.company_id
 left join
-    {{ ref('stg_policies') }} as po on cl.policy_sk = po.policy_sk
+    {{ ref('stg_providers') }} as pr 
+        on cl.affiliation_id = pr.affiliation_id
+left join
+    {{ ref('stg_member_policies') }} as mp 
+        on mb.member_id = mp.member_id 
+        and cast(cl.service_date as date) between cast(mp.policy_start_date as date) and coalesce(cast(mp.policy_end_date as date), date('now'))
+left join
+    {{ ref('stg_policies') }} as po 
+        on mp.policy_id = po.policy_id
+left join
+    {{ ref('int_member_household_income') }} as hh
+        on mb.member_sk = hh.member_sk
