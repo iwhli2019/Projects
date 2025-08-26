@@ -1,0 +1,23 @@
+name: 'datamarts_dbt'
+version: '2.0.0'
+profile: 'datamarts_dbt'
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets: 
+  - "target"
+  - "dbt_packages"
+
+models:
+  datamarts_dbt:
+    staging:
+      +materialized: table
+    intermediate:
+      +materialized: table
+    datamarts:
+      +materialized: table
+      +schema: main
